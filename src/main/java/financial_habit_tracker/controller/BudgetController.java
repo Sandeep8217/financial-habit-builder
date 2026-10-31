@@ -48,4 +48,15 @@ public class BudgetController {
                 month == null ? current.getMonthValue() : month
         );
     }
+    @PutMapping("/{id}")
+    public Budget updateBudget(
+            @PathVariable Long id,
+            @Valid @RequestBody Budget budget) {
+        return budgetService.updateBudget(id, budget);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBudget(@PathVariable Long id) {
+        budgetService.deleteBudget(id);
+    }
 }

@@ -1,7 +1,7 @@
 
 import { Target, Plus } from "lucide-react";
 
-export default function SavingsGoalCard({ goal, money }) {
+export default function SavingsGoalCard({ goal, money , onAddContribution }) {
     if (!goal) {
         return (
             <article className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-6 text-white shadow-sm">
@@ -61,6 +61,7 @@ export default function SavingsGoalCard({ goal, money }) {
 
             <button
                 type="button"
+                onClick={() => onAddContribution?.(goal)}
                 className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
             >
                 <Plus size={17} />

@@ -5,8 +5,24 @@ import financial_habit_tracker.entity.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
-    List<Budget> findByYearAndMonth(int year, int month);
+    List<Budget> findByUserId(Long userId);
+
+    List<Budget> findByUserIdAndYearAndMonth(
+            Long userId,
+            int year,
+            int month
+    );
+
+    Optional<Budget> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByUserIdAndCategoryIdAndYearAndMonth(
+            Long userId,
+            Long categoryId,
+            int year,
+            int month
+    );
 }

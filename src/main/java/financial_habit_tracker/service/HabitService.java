@@ -3,6 +3,7 @@ package financial_habit_tracker.service;
 
 import financial_habit_tracker.entity.Habit;
 import financial_habit_tracker.entity.HabitCompletion;
+import financial_habit_tracker.entity.User;
 import financial_habit_tracker.repository.HabitCompletionRepository;
 import financial_habit_tracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,26 +15,36 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HabitService {
 
     private final HabitRepository habitRepository;
     private final HabitCompletionRepository completionRepository;
+    private final CurrentUserService currentUserService;
 
     public List<Habit> getAllHabits() {
-        return habitRepository.findAll();
+        Long userId = currentUserService.getCurrentUserId();
+        return habitRepository.findAllByUserId(userId);
     }
 
+    @Transactional
     public Habit createHabit(Habit habit) {
+        User currentUser = currentUserService.getCurrentUser();
+
         habit.setId(null);
         habit.setTotalXp(0);
         habit.setCurrentStreak(0);
         habit.setLastCompletedDate(null);
+        habit.setUser(currentUser);
+
         return habitRepository.save(habit);
     }
 
     @Transactional
     public Habit completeHabit(Long id) {
-        Habit habit = habitRepository.findById(id)
+        Long userId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Habit not found"));
 
@@ -50,15 +61,13 @@ public class HabitService {
 
         LocalDate lastCompleted = habit.getLastCompletedDate();
 
-        if (today.equals(lastCompleted)) {
-            throw new IllegalArgumentException(
-                    "Habit already completed today");
-        }
-
         if (today.minusDays(1).equals(lastCompleted)) {
             habit.setCurrentStreak(habit.getCurrentStreak() + 1);
-        } else {
+        } else if (!today.equals(lastCompleted)) {
             habit.setCurrentStreak(1);
+        } else {
+            throw new IllegalArgumentException(
+                    "Habit already completed today");
         }
 
         habit.setLastCompletedDate(today);
@@ -73,16 +82,21 @@ public class HabitService {
     }
 
     public List<HabitCompletion> getCompletionHistory(Long habitId) {
-        if (!habitRepository.existsById(habitId)) {
-            throw new IllegalArgumentException("Habit not found");
-        }
+        Long userId = currentUserService.getCurrentUserId();
+
+        habitRepository.findByIdAndUserId(habitId, userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Habit not found"));
 
         return completionRepository
                 .findByHabitIdOrderByCompletionDateDesc(habitId);
     }
 
+    @Transactional
     public void deleteHabit(Long id) {
-        Habit habit = habitRepository.findById(id)
+        Long userId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Habit not found"));
 

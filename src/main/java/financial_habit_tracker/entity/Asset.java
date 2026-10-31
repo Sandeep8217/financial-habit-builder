@@ -30,4 +30,8 @@ public class Asset {
     @PositiveOrZero(message = "Asset value cannot be negative")
     @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal currentValue;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

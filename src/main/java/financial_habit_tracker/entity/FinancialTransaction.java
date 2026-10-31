@@ -19,6 +19,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class FinancialTransaction {
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

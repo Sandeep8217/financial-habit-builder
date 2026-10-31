@@ -30,4 +30,8 @@ public class Liability {
     @PositiveOrZero(message = "Outstanding amount cannot be negative")
     @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal outstandingAmount;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

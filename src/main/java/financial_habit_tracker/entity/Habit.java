@@ -37,4 +37,8 @@ public class Habit {
 
     @Column(nullable = false)
     private int currentStreak = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

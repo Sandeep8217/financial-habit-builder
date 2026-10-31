@@ -15,6 +15,7 @@ export default function Dashboard({
                                       liveGoals,
                                       money,
                                       monthlyData,
+                                      onAddContribution,
                                   }) {
     return (
         <div className="space-y-7 p-5 md:p-8">
@@ -39,7 +40,11 @@ export default function Dashboard({
                     transactions={liveTransactions}
                     money={money}
                 />
-                <SavingsGoalCard goal={liveGoals[0]} money={money} />
+                <SavingsGoalCard
+                    goal={liveGoals[0]}
+                    money={money}
+                    onAddContribution={onAddContribution}
+                />
             </section>
         </div>
     );

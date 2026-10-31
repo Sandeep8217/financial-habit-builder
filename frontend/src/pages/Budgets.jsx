@@ -96,11 +96,15 @@ export default function Budgets() {
         setSaving(true);
 
         try {
+            const [year, month] = form.month.split("-").map(Number);
+
             await api.post("/budgets", {
-                categoryId: Number(form.categoryId),
+                category: { id: Number(form.categoryId) },
                 amount: Number(form.amount),
-                month: form.month,
+                year,
+                month,
             });
+
 
             setForm((current) => ({
                 ...current,

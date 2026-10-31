@@ -69,12 +69,13 @@ export default function Transactions() {
 
         try {
             await api.post("/transactions", {
-                title: form.title.trim(),
+                description: form.title.trim(),
                 amount: Number(form.amount),
                 type: form.type,
-                categoryId: Number(form.categoryId),
+                category: {
+                    id: Number(form.categoryId),
+                },
                 transactionDate: form.transactionDate,
-                note: form.note.trim(),
             });
 
             setForm((current) => ({
@@ -298,7 +299,7 @@ export default function Transactions() {
                                 <tr key={transaction.id} className="hover:bg-slate-50">
                                     <td className="px-5 py-4">
                                         <p className="font-medium text-slate-800">
-                                            {transaction.title}
+                                            {transaction.description}
                                         </p>
                                         {transaction.note && (
                                             <p className="mt-1 text-xs text-slate-500">
@@ -328,7 +329,7 @@ export default function Transactions() {
                                         <button
                                             type="button"
                                             onClick={() => handleDelete(transaction.id)}
-                                            aria-label={`Delete ${transaction.title}`}
+                                            aria-label={`Delete ${transaction.description}`}
                                             className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
                                         >
                                             <Trash2 size={17} />

@@ -15,7 +15,13 @@ import java.math.BigDecimal;
 @Table(
         name = "budgets",
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"category_id", "budget_year", "budget_month"}
+                name = "uk_budget_user_category_period",
+                columnNames = {
+                        "user_id",
+                        "category_id",
+                        "budget_year",
+                        "budget_month"
+                }
         )
 )
 @Getter
@@ -44,4 +50,8 @@ public class Budget {
     @Min(1)
     @Column(name = "budget_month", nullable = false)
     private int month;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

@@ -13,6 +13,8 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.time.format.TextStyle;
 import java.util.Map;
 
 @Service
@@ -20,18 +22,21 @@ import java.util.Map;
 public class DashboardService {
 
     private final FinancialTransactionRepository transactionRepository;
+    private final CurrentUserService currentUserService;
 
     public Map<String, Object> getMonthlySummary(YearMonth month) {
+        Long userId = currentUserService.getCurrentUserId();
+
         LocalDate startDate = month.atDay(1);
         LocalDate endDate = month.plusMonths(1).atDay(1);
 
-        BigDecimal income = transactionRepository
-                .getTotalByTypeAndDateRange(
-                        CategoryType.INCOME, startDate, endDate);
+        BigDecimal income = transactionRepository.getTotalByTypeAndDateRange(
+                CategoryType.INCOME, startDate, endDate, userId
+        );
 
-        BigDecimal expenses = transactionRepository
-                .getTotalByTypeAndDateRange(
-                        CategoryType.EXPENSE, startDate, endDate);
+        BigDecimal expenses = transactionRepository.getTotalByTypeAndDateRange(
+                CategoryType.EXPENSE, startDate, endDate, userId
+        );
 
         Map<String, Object> summary = new LinkedHashMap<>();
         summary.put("month", month.toString());
@@ -43,6 +48,7 @@ public class DashboardService {
     }
 
     public List<MonthlyCashFlow> getLastSixMonthsCashFlow() {
+        Long userId = currentUserService.getCurrentUserId();
         YearMonth currentMonth = YearMonth.now();
 
         List<MonthlyCashFlow> results = new ArrayList<>();
@@ -54,30 +60,22 @@ public class DashboardService {
             LocalDate endDate = month.plusMonths(1).atDay(1);
 
             BigDecimal income = transactionRepository.getTotalByTypeAndDateRange(
-                    CategoryType.INCOME,
-                    startDate,
-                    endDate
+                    CategoryType.INCOME, startDate, endDate, userId
             );
 
             BigDecimal expenses = transactionRepository.getTotalByTypeAndDateRange(
-                    CategoryType.EXPENSE,
-                    startDate,
-                    endDate
+                    CategoryType.EXPENSE, startDate, endDate, userId
             );
 
-            results.add(
-                    new MonthlyCashFlow(
-                            month.getMonth().getDisplayName(
-                                    java.time.format.TextStyle.SHORT,
-                                    java.util.Locale.ENGLISH
-                            ),
-                            income,
-                            expenses
-                    )
-            );
+            results.add(new MonthlyCashFlow(
+                    month.getMonth().getDisplayName(
+                            TextStyle.SHORT, Locale.ENGLISH
+                    ),
+                    income,
+                    expenses
+            ));
         }
 
         return results;
     }
-
 }
