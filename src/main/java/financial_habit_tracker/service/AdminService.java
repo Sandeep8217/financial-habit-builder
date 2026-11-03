@@ -1,23 +1,89 @@
 
 package financial_habit_tracker.service;
 
+import financial_habit_tracker.dto.AdminAnalyticsResponse;
+import financial_habit_tracker.dto.AdminDashboardStatsResponse;
 import financial_habit_tracker.dto.AdminUserResponse;
+import financial_habit_tracker.dto.UserRegistrationTrendResponse;
+import financial_habit_tracker.entity.FeedbackStatus;
 import financial_habit_tracker.entity.User;
-import financial_habit_tracker.repository.UserRepository;
+import financial_habit_tracker.repository.*;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class AdminService {
+
+    private final FinancialTransactionRepository transactionRepository;
 
     private final UserRepository userRepository;
 
-    public AdminService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    private final HabitRepository habitRepository;
+    private final SavingsGoalRepository savingsGoalRepository;
+
+    private final FeedbackRepository feedbackRepository;
+
+
+    @Transactional(readOnly = true)
+
+    public AdminAnalyticsResponse getAnalytics() {
+
+
+        long totalHabits = habitRepository.count();
+        long activeHabits = habitRepository.countByActiveTrue();
+        long inactiveHabits = habitRepository.countByActiveFalse();
+
+        long totalGoals = savingsGoalRepository.count();
+        long completedGoals = savingsGoalRepository.countCompletedGoals();
+
+        double completionRate = totalGoals == 0
+                ? 0.0
+                : (completedGoals * 100.0) / totalGoals;
+
+        return new AdminAnalyticsResponse(
+                totalHabits,
+                activeHabits,
+                inactiveHabits,
+                totalGoals,
+                completedGoals,
+                Math.round(completionRate * 100.0) / 100.0
+        );
+    }
+
+//    public AdminService(
+//            UserRepository userRepository,
+//            FinancialTransactionRepository transactionRepository
+//    ) {
+//        this.userRepository = userRepository;
+//        this.transactionRepository = transactionRepository;
+//    }
+
+    @Transactional(readOnly = true)
+    public AdminDashboardStatsResponse getDashboardStats() {
+
+        long totalUsers = userRepository.count();
+        long activeUsers = userRepository.countByEnabledTrue();
+        long totalTransactions = transactionRepository.count();
+
+        long pendingFeedback =
+                feedbackRepository.countByStatus(FeedbackStatus.PENDING);
+
+        return new AdminDashboardStatsResponse(
+                totalUsers,
+                activeUsers,
+                totalTransactions,
+                pendingFeedback
+        );
     }
 
     @Transactional(readOnly = true)
@@ -145,5 +211,22 @@ public class AdminService {
                 user.isEnabled(),
                 user.getCreatedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserRegistrationTrendResponse> getRegistrationTrend() {
+
+        LocalDateTime startDate = LocalDate.now()
+                .minusMonths(5)
+                .withDayOfMonth(1)
+                .atStartOfDay();
+
+        return userRepository.getMonthlyRegistrationTrend(startDate)
+                .stream()
+                .map(item -> new UserRegistrationTrendResponse(
+                        item.getMonth(),
+                        item.getUsers()
+                ))
+                .toList();
     }
 }

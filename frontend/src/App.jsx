@@ -11,7 +11,16 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import AdminRoute from "./components/AdminRoute";
+import AdminLayout from "./pages/admin/AdminLayout";
+
 import { useAuth } from "./context/AuthContext";
+
+import AdminOverview from "./pages/admin/AdminOverview";
+
+import AdminUsers from "./pages/admin/AdminUsers";
+
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
 import {
     NavLink,
@@ -30,10 +39,14 @@ import {
     Bell,
     Search,
     LogOut,
+    MessageSquare,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import api from "./api/api";
+import AdminCategories from "./pages/admin/AdminCategories.jsx";
+import AdminFeedback from "./pages/admin/AdminFeedback.jsx";
+import Feedback from "./pages/Feedback.jsx";
 
 const money = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -49,6 +62,7 @@ const navigation = [
     { label: "Savings Goals", icon: Target },
     { label: "Habits", icon: Heart },
     { label: "Wealth", icon: TrendingUp },
+    { label: "Feedback", icon: MessageSquare },
 ];
 
 // Main authenticated application
@@ -342,6 +356,10 @@ function DashboardLayout() {
                         element={<Wealth />}
                     />
 
+                    <Route
+                        path="feedback"
+                        element={<Feedback />} />
+
                 </Routes>
             </main>
         </div>
@@ -377,7 +395,16 @@ function App() {
                     element={<DashboardLayout />}
                 />
             </Route>
-
+            {/* Protected Admin Routes */}
+            <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminOverview />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
+                    <Route path="categories" element={<AdminCategories />} />
+                    <Route path="feedback" element={<AdminFeedback />} />
+                </Route>
+            </Route>
         </Routes>
     );
 }

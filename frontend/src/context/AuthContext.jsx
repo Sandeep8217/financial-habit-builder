@@ -90,6 +90,8 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    const isAdmin = user?.role === "ADMIN";
+
     return (
         <AuthContext.Provider
             value={{
@@ -97,6 +99,7 @@ export function AuthProvider({ children }) {
                 token,
                 loading,
                 isAuthenticated: Boolean(token && user),
+                isAdmin,
                 login,
                 register,
                 logout,

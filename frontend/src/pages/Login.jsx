@@ -29,7 +29,16 @@ export default function Login() {
 
         try {
             await login(formData);
-            navigate("/app", { replace: true });
+
+            const loggedInUser = JSON.parse(
+                localStorage.getItem("wealthwise_user")
+            );
+
+            if (loggedInUser?.role === "ADMIN") {
+                navigate("/admin", { replace: true });
+            } else {
+                navigate("/app", { replace: true });
+            }
         } catch (err) {
             setError(
                 err.response?.data?.message ||

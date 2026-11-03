@@ -7,6 +7,8 @@ const api = axios.create({
     },
 });
 
+console.log("WealthWise API URL:", api.defaults.baseURL);
+
 // Attach JWT automatically to every API request.
 api.interceptors.request.use(
     (config) => {

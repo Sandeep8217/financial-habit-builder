@@ -1,7 +1,10 @@
 
 package financial_habit_tracker.controller;
 
+import financial_habit_tracker.dto.AdminAnalyticsResponse;
+import financial_habit_tracker.dto.AdminDashboardStatsResponse;
 import financial_habit_tracker.dto.AdminUserResponse;
+import financial_habit_tracker.dto.UserRegistrationTrendResponse;
 import financial_habit_tracker.service.AdminService;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -71,6 +76,27 @@ public class AdminController {
                         enabled,
                         authentication.getName()
                 )
+        );
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<AdminDashboardStatsResponse> getDashboardStats() {
+        return ResponseEntity.ok(
+                adminService.getDashboardStats()
+        );
+    }
+
+    @GetMapping("/registration-trend")
+    public ResponseEntity<List<UserRegistrationTrendResponse>> getRegistrationTrend() {
+        return ResponseEntity.ok(
+                adminService.getRegistrationTrend()
+        );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<AdminAnalyticsResponse> getAnalytics() {
+        return ResponseEntity.ok(
+                adminService.getAnalytics()
         );
     }
 }
